@@ -233,7 +233,7 @@ thread_check_sleep (void)
     {
       struct thread *t = list_entry (e, struct thread, blockelem);
       t->block_ticks--;
-      if (t->block_ticks == 0) 
+      if (t->block_ticks <= 0) 
 	{
 	  list_remove(&t->blockelem);
 	  thread_unblock (t);
