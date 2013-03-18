@@ -88,6 +88,7 @@ struct thread
     char name[16];                      /* Name (for debugging purposes). */
     uint8_t *stack;                     /* Saved stack pointer. */
     int priority;                       /* Priority. */
+    int donation_depth;                 /* Donation depth of the current thread */
     int block_ticks;                    /* Ticks since blocked */
     struct list_elem allelem;           /* List element for all threads list. */
     
@@ -119,7 +120,7 @@ void thread_print_stats (void);
 
 typedef void thread_func (void *aux);
 tid_t thread_create (const char *name, int priority, thread_func *, void *);
-
+struct list_elem * list_elem_highest_priority_thread (struct list * t_list);
 void thread_check_sleep (void);
 /* set current_thread to block for ticks ticks
 , add thread to block_list

@@ -114,8 +114,13 @@ sema_up (struct semaphore *sema)
 
   old_level = intr_disable ();
   if (!list_empty (&sema->waiters)) 
-    thread_unblock (list_entry (list_pop_front (&sema->waiters),
-                                struct thread, elem));
+    {
+      struct list_elem *next = list_elem_highest_priority_thread (&sema->waiters);
+      list_remove(next);
+      thread_unblock (list_entry (next, struct thread, elem));
+    }
+    //thread_unblock (list_entry (list_pop_front (&sema->waiters),
+                                //struct thread, elem));
   sema->value++;
   intr_set_level (old_level);
 }
@@ -195,8 +200,34 @@ lock_acquire (struct lock *lock)
   ASSERT (lock != NULL);
   ASSERT (!intr_context ());
   ASSERT (!lock_held_by_current_thread (lock));
-
+  
+  //my changes
+  //kernel panic in thread_current() is_thread() failed
+  //Could it be a recursion too large problem??
+  //The answer is no.
+  //Lock->holder init is NULL. Fault to ignore that.
+  //Problem fixed. Proved to be the problem above.
+  if (lock->holder != NULL)
+    {
+      //int old_priority = -1;
+      //int old_depth = lock->holder->donation_depth;
+      if (thread_current()->donation_depth <= 8 && lock->holder->priority < thread_current ()->priority)
+        {
+          //old_priority = lock->holder->priority;
+          lock->holder->donation_depth = thread_current ()->donation_depth + 1;
+          lock->holder->priority = thread_current ()->priority;
+        }
+    }
+  //my changes end
   sema_down (&lock->semaphore);
+  //my changes
+  //May not need to give the old priority back
+  //if (lock->holder != NULL)
+    //{
+      //lock->holder->priority = old_priority;
+      //lock->holder->donation_depth = old_depth;
+    //}
+  //my changes end
   lock->holder = thread_current ();
 }
 

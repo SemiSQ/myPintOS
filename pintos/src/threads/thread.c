@@ -216,6 +216,27 @@ thread_create (const char *name, int priority,
   return tid;
 }
 
+/* Go through the list in param and return the thread with the 
+   highest priority. */
+struct list_elem *
+list_elem_highest_priority_thread (struct list * t_list)
+{
+    struct list_elem *e,*next; 
+    struct thread *temp;
+    int max_priority = -1;
+    for (next = e = list_begin (t_list); e != list_end (t_list);
+         e = list_next (e))
+      {
+        temp = list_entry (e, struct thread, elem);
+        if (temp->priority > max_priority)
+	  {
+	    next = e;
+	    max_priority = temp->priority;
+	  }
+      }
+    return next;  
+}
+
 /* Check if threads that are asleep
    exceed their ticks. */
 void
@@ -299,6 +320,8 @@ thread_unblock (struct thread *t)
   ASSERT (t->status == THREAD_BLOCKED);
   list_push_back (&ready_list, &t->elem);
   t->status = THREAD_READY;
+  //if (t->priority > thread_current()->priority)
+    //thread_yield();
   intr_set_level (old_level);
 }
 
@@ -396,6 +419,8 @@ void
 thread_set_priority (int new_priority) 
 {
   thread_current ()->priority = new_priority;
+  if (new_priority < list_entry (list_elem_highest_priority_thread (&ready_list), struct thread, elem) ->priority)
+    thread_yield ();
 }
 
 /* Returns the current thread's priority. */
@@ -520,6 +545,7 @@ init_thread (struct thread *t, const char *name, int priority)
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
+  t->donation_depth = 1;
   t->magic = THREAD_MAGIC;
   list_push_back (&all_list, &t->allelem);
 }
@@ -547,8 +573,28 @@ next_thread_to_run (void)
 {
   if (list_empty (&ready_list))
     return idle_thread;
-  else
-    return list_entry (list_pop_front (&ready_list), struct thread, elem);
+  else {
+    //Here exists an operation
+    //on the ready_list. 
+    //It removes the next thread to run from it
+    //Shouldn't it has a lock or so???
+    struct list_elem *e,*next; 
+    struct thread *temp;
+    int max_priority = -1;
+    for (next = e = list_begin (&ready_list); e != list_end (&ready_list);
+         e = list_next (e))
+      {
+        temp = list_entry (e, struct thread, elem);
+        if (temp->priority > max_priority)
+	  {
+	    next = e;
+	    max_priority = temp->priority;
+	  }
+      }
+    list_remove(next);
+    return list_entry (next, struct thread, elem);
+  }
+    //return list_entry (list_pop_front (&ready_list), struct thread, elem);
 }
 
 /* Completes a thread switch by activating the new thread's page
