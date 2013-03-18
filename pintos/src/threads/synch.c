@@ -201,37 +201,8 @@ lock_acquire (struct lock *lock)
   ASSERT (!intr_context ());
   ASSERT (!lock_held_by_current_thread (lock));
   
-  //my changes
-  //kernel panic in thread_current() is_thread() failed
-  //Could it be a recursion too large problem??
-  //The answer is no.
-  //Lock->holder init is NULL. Fault to ignore that.
-  //Problem fixed. Proved to be the problem above.
-  if (lock->holder != NULL)
-    {
-      //int old_priority = -1;
-      //int old_depth = lock->holder->donation_depth;
-      if (thread_current()->donation_depth <= 8 && lock->holder->priority < thread_current ()->priority)
-        {
-          //old_priority = lock->holder->priority;
-	  /* Check if the thread itself setting priority or other thread donating priority */
-	  if (!lock_held_by_current_thread(&lock->holder->pri_lock))
-            lock_acquire(&lock->holder->pri_lock);
-          lock->holder->donation_depth = thread_current ()->donation_depth + 1;
-          lock->holder->priority = thread_current ()->priority;
-          lock_release(&lock->holder->pri_lock);
-        }
-    }
-  //my changes end
   sema_down (&lock->semaphore);
-  //my changes
-  //May not need to give the old priority back
-  //if (lock->holder != NULL)
-    //{
-      //lock->holder->priority = old_priority;
-      //lock->holder->donation_depth = old_depth;
-    //}
-  //my changes end
+
   lock->holder = thread_current ();
 }
 
