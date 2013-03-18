@@ -9,7 +9,7 @@
 #include "threads/intr-stubs.h"
 #include "threads/palloc.h"
 #include "threads/switch.h"
-#include "threads/synch.h"
+//#include "threads/synch.h"
 #include "threads/vaddr.h"
 #ifdef USERPROG
 #include "userprog/process.h"
@@ -39,6 +39,9 @@ static struct thread *initial_thread;
 
 /* Lock used by allocate_tid(). */
 static struct lock tid_lock;
+
+/* Lock used by thread_block(). */
+//static struct lock block_lock;
 
 /* Stack frame for kernel_thread(). */
 struct kernel_thread_frame 
@@ -93,6 +96,7 @@ thread_init (void)
   ASSERT (intr_get_level () == INTR_OFF);
 
   lock_init (&tid_lock);
+  //lock_init (&block_lock);
   list_init (&ready_list);
   list_init (&all_list);
   list_init (&block_list);
@@ -187,6 +191,8 @@ thread_create (const char *name, int priority,
   /* Initialize thread. */
   init_thread (t, name, priority);
   tid = t->tid = allocate_tid ();
+
+  lock_init (&t->pri_lock);
 
   /* Prepare thread for first run by initializing its stack.
      Do this atomically so intermediate values for the 'stack' 
@@ -297,8 +303,16 @@ thread_block (void)
   ASSERT (!intr_context ());
   ASSERT (intr_get_level () == INTR_OFF);
 
+  /* Can't really do that
+     It will call a thread_block inside the lock_acquire
+     Which means an infinite loop. */
+  //if (!lock_held_by_current_thread(&block_lock))
+    //lock_acquire(&block_lock);
+
   thread_current ()->status = THREAD_BLOCKED;
   schedule ();
+
+  //lock_release(&block_lock);
 }
 
 /* Transitions a blocked thread T to the ready-to-run state.
@@ -418,9 +432,12 @@ thread_foreach (thread_action_func *func, void *aux)
 void
 thread_set_priority (int new_priority) 
 {
+  if (!lock_held_by_current_thread(&thread_current ()->pri_lock))
+    lock_acquire(&thread_current ()->pri_lock);
   thread_current ()->priority = new_priority;
   if (new_priority < list_entry (list_elem_highest_priority_thread (&ready_list), struct thread, elem) ->priority)
     thread_yield ();
+  lock_release(&thread_current ()->pri_lock);
 }
 
 /* Returns the current thread's priority. */
@@ -683,3 +700,4 @@ allocate_tid (void)
 /* Offset of `stack' member within `struct thread'.
    Used by switch.S, which can't figure it out on its own. */
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
+

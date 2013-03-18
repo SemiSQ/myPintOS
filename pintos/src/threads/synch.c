@@ -214,8 +214,12 @@ lock_acquire (struct lock *lock)
       if (thread_current()->donation_depth <= 8 && lock->holder->priority < thread_current ()->priority)
         {
           //old_priority = lock->holder->priority;
+	  /* Check if the thread itself setting priority or other thread donating priority */
+	  if (!lock_held_by_current_thread(&lock->holder->pri_lock))
+            lock_acquire(&lock->holder->pri_lock);
           lock->holder->donation_depth = thread_current ()->donation_depth + 1;
           lock->holder->priority = thread_current ()->priority;
+          lock_release(&lock->holder->pri_lock);
         }
     }
   //my changes end

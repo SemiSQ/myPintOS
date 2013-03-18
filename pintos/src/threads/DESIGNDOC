@@ -68,6 +68,11 @@ its block_ticks and unblock it.
 >> timer_sleep() simultaneously?
 
 At this point, by disabling interrupts.
+thread_block can't use locks cause lock_acquire which will call a thread_block 
+and result in an infinite loop.
+Perhaps it can be dealt with changing the lock_acquire into try_lock_acquire, 
+which will not block the current thread, instead put a while around it.
+But isn't that busywaiting? Why would blocking a thread needs blocking it? 
 
 >> A5: How are race conditions avoided when a timer interrupt occurs
 >> during a call to timer_sleep()?
@@ -94,6 +99,8 @@ are a lot of threads un-sleep and in the whole list.
 
 /* Depth of the thread's priority donation. */
 int donation_depth
+/* Lock of the priority */
+struct lock pri_lock
 
 >> B2: Explain the data structure used to track priority donation.
 >> Use ASCII art to diagram a nested donation.  (Alternately, submit a
@@ -134,14 +141,17 @@ the thread with the highest priority and pass the lock to it.
 >> how your implementation avoids it.  Can you use a lock to avoid
 >> this race?
 
-NOT DONE YET
+Thread's priority may be changed by:
+1. Thread itself.
+2. Thread acquiring a lock it holds donating priority
+Let every thread has a lock, which must be acquired to change its priority.
 
 ---- RATIONALE ----
 
 >> B7: Why did you choose this design?  In what ways is it superior to
 >> another design you considered?
 
-NOT DONE YET
+NEED FURTHER THINKING.
 
 			  ADVANCED SCHEDULER
 			  ==================
