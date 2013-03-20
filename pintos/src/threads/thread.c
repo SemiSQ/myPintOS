@@ -235,8 +235,6 @@ thread_create (const char *name, int priority,
   init_thread (t, name, priority);
   tid = t->tid = allocate_tid ();
 
-  lock_init (&t->pri_lock);
-
   t->recent_cpu = thread_current ()->recent_cpu;
 
   t->priority = thread_calculate_priority (t);
@@ -617,6 +615,7 @@ init_thread (struct thread *t, const char *name, int priority)
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
   t->recent_cpu = 0;
+  lock_init (&t->pri_lock);
   t->magic = THREAD_MAGIC;
   list_push_back (&all_list, &t->allelem);
 }
