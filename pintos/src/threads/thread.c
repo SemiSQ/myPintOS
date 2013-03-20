@@ -192,17 +192,7 @@ thread_create (const char *name, int priority,
   init_thread (t, name, priority);
   tid = t->tid = allocate_tid ();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  t->recent_cpu = thread_current ()->recent_cpu;
-
-  t->priority = thread_calculate_priority (t);
-=======
   lock_init (&t->pri_lock);
->>>>>>> parent of e2047a0... Project1: Advanced Scheduler Part1
-=======
-  lock_init (&t->pri_lock);
->>>>>>> parent of e2047a0... Project1: Advanced Scheduler Part1
 
   /* Prepare thread for first run by initializing its stack.
      Do this atomically so intermediate values for the 'stack' 
@@ -571,18 +561,10 @@ init_thread (struct thread *t, const char *name, int priority)
   t->status = THREAD_BLOCKED;
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  t->recent_cpu = 0;
-  lock_init (&t->pri_lock);
-=======
+
   t->priority = priority;
   t->donation_depth = 1;
->>>>>>> parent of e2047a0... Project1: Advanced Scheduler Part1
-=======
-  t->priority = priority;
-  t->donation_depth = 1;
->>>>>>> parent of e2047a0... Project1: Advanced Scheduler Part1
+
   t->magic = THREAD_MAGIC;
   list_push_back (&all_list, &t->allelem);
 }
