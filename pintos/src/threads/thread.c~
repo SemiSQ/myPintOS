@@ -40,6 +40,9 @@ static struct thread *initial_thread;
 /* Lock used by allocate_tid(). */
 static struct lock tid_lock;
 
+/* System load average. */
+static int load_avg;
+
 /* Lock used by thread_block(). */
 //static struct lock block_lock;
 
@@ -74,6 +77,7 @@ static void init_thread (struct thread *, const char *name, int priority);
 static bool is_thread (struct thread *) UNUSED;
 static void *alloc_frame (struct thread *, size_t size);
 static void schedule (void);
+void thread_update_priority (void);
 void thread_schedule_tail (struct thread *prev);
 static tid_t allocate_tid (void);
 
@@ -101,6 +105,8 @@ thread_init (void)
   list_init (&all_list);
   list_init (&block_list);
 
+  load_avg = 0;
+
   /* Set up a thread structure for the running thread. */
   initial_thread = running_thread ();
   init_thread (initial_thread, "main", PRI_DEFAULT);
@@ -125,6 +131,40 @@ thread_start (void)
   sema_down (&idle_started);
 }
 
+/* Updates the priority of all the threads. */
+void 
+thread_update_priority (void)
+{
+  enum intr_level old_level;
+  old_level = intr_disable ();
+
+  struct list_elem *e;
+
+  ASSERT (intr_get_level () == INTR_OFF);
+
+  int f = 1<<14;
+  int f2 = f/2;
+  int load_avg1 = (59*f+f2)/60;
+  int load_avg2 = (f+f2)/60;
+  load_avg = (((int64_t) load_avg1) * load_avg) / f + load_avg2 * list_size (&ready_list);  
+  int64_t recent_cpu1 = ((int64_t) load_avg) * 2 * f;
+  int recent_cpu2 = load_avg * 2 + 1;
+  recent_cpu1 = recent_cpu1 / recent_cpu2;
+  load_avg = (load_avg + f2) / f;
+
+  for (e = list_begin (&all_list); e != list_end (&all_list);
+       e = list_next (e))
+    {
+      struct thread *t = list_entry (e, struct thread, allelem);
+      t->recent_cpu = (t->recent_cpu * recent_cpu1 + f2)/f + t->nice;
+      t->priority = thread_calculate_priority(t);
+    }
+
+  //thread_yield(); //this might be unnecessary
+
+  intr_set_level (old_level);
+}
+
 /* Called by the timer interrupt handler at each timer tick.
    Thus, this function runs in an external interrupt context. */
 void
@@ -141,6 +181,9 @@ thread_tick (void)
 #endif
   else
     kernel_ticks++;
+
+  if (t != idle_thread)
+    t->recent_cpu++;
 
   /* Enforce preemption. */
   if (++thread_ticks >= TIME_SLICE)
@@ -192,13 +235,11 @@ thread_create (const char *name, int priority,
   init_thread (t, name, priority);
   tid = t->tid = allocate_tid ();
 
-<<<<<<< HEAD
+  lock_init (&t->pri_lock);
+
   t->recent_cpu = thread_current ()->recent_cpu;
 
   t->priority = thread_calculate_priority (t);
-=======
-  lock_init (&t->pri_lock);
->>>>>>> parent of e2047a0... Project1: Advanced Scheduler Part1
 
   /* Prepare thread for first run by initializing its stack.
      Do this atomically so intermediate values for the 'stack' 
@@ -453,35 +494,43 @@ thread_get_priority (void)
   return thread_current ()->priority;
 }
 
+/* Calculates the current thread's priority by
+   priority = PRI_MAX - (recent_cpu / 4) - (nice * 2). */
+int
+thread_calculate_priority (struct thread * t)
+{
+  int p = PRI_MAX - (t->recent_cpu / 4) - (t->nice * 2);
+  return p;
+}
+
 /* Sets the current thread's nice value to NICE. */
 void
-thread_set_nice (int nice UNUSED) 
+thread_set_nice (int NICE) 
 {
-  /* Not yet implemented. */
+  thread_current ()->nice = NICE;
+  int p = thread_calculate_priority (thread_current ());
+  thread_set_priority (p);
 }
 
 /* Returns the current thread's nice value. */
 int
 thread_get_nice (void) 
 {
-  /* Not yet implemented. */
-  return 0;
+  return thread_current ()->nice;
 }
 
 /* Returns 100 times the system load average. */
 int
 thread_get_load_avg (void) 
 {
-  /* Not yet implemented. */
-  return 0;
+  return 100*load_avg;
 }
 
 /* Returns 100 times the current thread's recent_cpu value. */
 int
 thread_get_recent_cpu (void) 
 {
-  /* Not yet implemented. */
-  return 0;
+  return 100*thread_current ()->recent_cpu;
 }
 
 /* Idle thread.  Executes when no other thread is ready to run.
@@ -567,13 +616,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->status = THREAD_BLOCKED;
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
-<<<<<<< HEAD
   t->recent_cpu = 0;
-  lock_init (&t->pri_lock);
-=======
-  t->priority = priority;
-  t->donation_depth = 1;
->>>>>>> parent of e2047a0... Project1: Advanced Scheduler Part1
   t->magic = THREAD_MAGIC;
   list_push_back (&all_list, &t->allelem);
 }
