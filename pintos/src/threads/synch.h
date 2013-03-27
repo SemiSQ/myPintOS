@@ -7,24 +7,29 @@
 /* A counting semaphore. */
 struct semaphore 
   {
+		bool isLock;                /* If is in a lock. If so then no need to yield when sema_up(). */
     unsigned value;             /* Current value. */
     struct list waiters;        /* List of waiting threads. */
   };
 
 void sema_init (struct semaphore *, unsigned value);
+int sema_max_pri (struct semaphore *sema);
 void sema_down (struct semaphore *);
 bool sema_try_down (struct semaphore *);
-void sema_up (struct semaphore *);
+int sema_up (struct semaphore *); /* Change to return the highest priority in the waiting list. */
 void sema_self_test (void);
 
 /* Lock. */
 struct lock 
   {
+		struct list_elem lock_elem;
+		int max_pri;                /* Max priority of all the threads on this lock. */
     struct thread *holder;      /* Thread holding lock (for debugging). */
     struct semaphore semaphore; /* Binary semaphore controlling access. */
   };
 
 void lock_init (struct lock *);
+int  lock_max_pri (struct lock *);
 void lock_acquire (struct lock *);
 bool lock_try_acquire (struct lock *);
 void lock_release (struct lock *);

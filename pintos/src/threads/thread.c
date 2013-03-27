@@ -192,7 +192,6 @@ thread_create (const char *name, int priority,
   init_thread (t, name, priority);
   tid = t->tid = allocate_tid ();
 
-  lock_init (&t->pri_lock);
 
   /* Prepare thread for first run by initializing its stack.
      Do this atomically so intermediate values for the 'stack' 
@@ -219,6 +218,9 @@ thread_create (const char *name, int priority,
   /* Add to run queue. */
   thread_unblock (t);
 
+  if (t->priority > thread_get_priority ())
+    thread_yield();
+
   return tid;
 }
 
@@ -235,10 +237,10 @@ list_elem_highest_priority_thread (struct list * t_list)
       {
         temp = list_entry (e, struct thread, elem);
         if (temp->priority > max_priority)
-	  {
-	    next = e;
-	    max_priority = temp->priority;
-	  }
+				{
+					next = e;
+					max_priority = temp->priority;
+				}
       }
     return next;  
 }
@@ -334,8 +336,6 @@ thread_unblock (struct thread *t)
   ASSERT (t->status == THREAD_BLOCKED);
   list_push_back (&ready_list, &t->elem);
   t->status = THREAD_READY;
-  //if (t->priority > thread_current()->priority)
-    //thread_yield();
   intr_set_level (old_level);
 }
 
@@ -428,16 +428,51 @@ thread_foreach (thread_action_func *func, void *aux)
     }
 }
 
+/* Find the highest priority of the max_pri of all the locks
+	 this thread owns. Returns -1 if no locks owned. */
+int
+thread_locks_pri (void)
+{
+	struct thread *curr = thread_current ();
+	/* Find the biggest pri of all the locks curr has. */
+	struct list_elem *e;
+	struct list *locks = &curr->locks;
+	int max_pri_locks = -1,temp;
+  for (e = list_begin (locks); e != list_end (locks);
+       e = list_next (e))
+    {
+			temp = list_entry(e, struct lock, lock_elem)->max_pri;
+			if (max_pri_locks < temp)
+				max_pri_locks = temp;
+    }			
+	return max_pri_locks;
+}
+ 
+
 /* Sets the current thread's priority to NEW_PRIORITY. */
 void
 thread_set_priority (int new_priority) 
 {
-  if (!lock_held_by_current_thread(&thread_current ()->pri_lock))
-    lock_acquire(&thread_current ()->pri_lock);
-  thread_current ()->priority = new_priority;
+  enum intr_level old_level;
+  
+  ASSERT(!intr_context ());
+
+  old_level = intr_disable ();
+
+	if (!thread_mlfqs) {
+		int lock_pri = thread_locks_pri ();
+		thread_current ()->base_pri = new_priority;
+		if (lock_pri > new_priority) ;
+		else
+			thread_current ()->priority = new_priority;
+	}
+	else 
+		thread_current ()->priority = new_priority;
+
   if (new_priority < list_entry (list_elem_highest_priority_thread (&ready_list), struct thread, elem) ->priority)
     thread_yield ();
-  lock_release(&thread_current ()->pri_lock);
+
+  intr_set_level (old_level);
 }
 
 /* Returns the current thread's priority. */
@@ -561,9 +596,17 @@ init_thread (struct thread *t, const char *name, int priority)
   t->status = THREAD_BLOCKED;
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
+	
+	if (!thread_mlfqs) {
+		t->priority = priority;
+		t->base_pri = priority;
+		t->donation_depth = 1;
+		t->waiting = NULL;
+		list_init (&t->locks);
+	}
+	else t->priority = thread_current ()->priority;
 
-  t->priority = priority;
-  t->donation_depth = 1;
+  //lock_init (&t->pri_lock);
 
   t->magic = THREAD_MAGIC;
   list_push_back (&all_list, &t->allelem);
@@ -605,10 +648,10 @@ next_thread_to_run (void)
       {
         temp = list_entry (e, struct thread, elem);
         if (temp->priority > max_priority)
-	  {
-	    next = e;
-	    max_priority = temp->priority;
-	  }
+				{
+					next = e;
+					max_priority = temp->priority;
+				}
       }
     list_remove(next);
     return list_entry (next, struct thread, elem);

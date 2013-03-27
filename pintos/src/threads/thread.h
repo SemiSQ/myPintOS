@@ -89,9 +89,14 @@ struct thread
     char name[16];                      /* Name (for debugging purposes). */
     uint8_t *stack;                     /* Saved stack pointer. */
     int priority;                       /* Priority. */
+		int base_pri;                       /* Base priority in priority donation */
     int donation_depth;                 /* Donation depth of the current thread */
     int block_ticks;                    /* Ticks since blocked */
-    struct lock pri_lock;               /* Lock on priority changing */
+    //struct lock pri_lock;               /* Lock on priority changing */
+		struct lock *waiting;               /* Used for current thread to donate priority to waiting. */
+		
+		struct list locks;             /* List element for all the locks this thread pocess. */
+
     struct list_elem allelem;           /* List element for all threads list. */
     
     /* Used for blocklist */
@@ -142,6 +147,7 @@ void thread_yield (void);
 typedef void thread_action_func (struct thread *t, void *aux);
 void thread_foreach (thread_action_func *, void *);
 
+int thread_locks_pri (void);
 int thread_get_priority (void);
 void thread_set_priority (int);
 
