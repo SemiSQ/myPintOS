@@ -172,6 +172,8 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
+  if (ticks % 4 == 0)
+    
   thread_tick ();
   thread_check_sleep();
 }
