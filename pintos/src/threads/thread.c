@@ -621,11 +621,11 @@ thread_set_nice (int new_nice)
 
 	struct thread *curr_thrd = thread_current ();
 
-  curr_thrd->nice = new_nice;
-	//thread_calculate_recent_cpu (curr_thrd);
+    curr_thrd->nice = new_nice;
+	thread_calculate_recent_cpu (curr_thrd);
 	thread_calculate_priority (curr_thrd);
 	if (curr_thrd->priority < list_entry (list_elem_highest_priority_thread (&ready_list), struct thread, elem) ->priority)
-    thread_yield ();
+        thread_yield ();
 	
 	//Will it reach here?
 	//intr_set_level (old_level);
