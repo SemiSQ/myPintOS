@@ -172,9 +172,10 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
-	if (thread_mlfqs) {
+  thread_tick ();
+  if (thread_mlfqs) {
 		//msg ("cpu before :%d", thread_current () -> recent_cpu);
-		thread_current ()->recent_cpu += (1<<17);
+		thread_increase_recent_cpu ();
 		//msg ("cpu after :%d", thread_current () -> recent_cpu);
 		if (ticks % TIMER_FREQ == 0) {
 			thread_calculate_load_avg ();
@@ -184,7 +185,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
 			thread_calculate_priority_all ();	
 		}
 	}
-  thread_tick ();
+
   thread_check_sleep();
 }
 

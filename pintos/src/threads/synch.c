@@ -110,7 +110,7 @@ sema_up (struct semaphore *sema)
 {
   enum intr_level old_level;
   struct list_elem *next = NULL;
-	int pri;
+  int pri;
   ASSERT (sema != NULL);
 
   old_level = intr_disable ();
@@ -118,14 +118,14 @@ sema_up (struct semaphore *sema)
     {
       next = list_elem_highest_priority_thread (&sema->waiters);
       list_remove(next);
-			pri = list_entry (next, struct thread, elem) -> priority;
+	  pri = list_entry (next, struct thread, elem) -> priority;
       thread_unblock (list_entry (next, struct thread, elem));			
     }
-	else pri = -1;
+  else pri = -1;
 
   sema->value++;
   intr_set_level (old_level);
-	if (!sema->isLock && next != NULL)
+  if ((!sema->isLock || thread_mlfqs) && next != NULL)
   	if (list_entry (next, struct thread, elem)->priority > thread_current()->priority)
     	thread_yield();			
 
@@ -249,7 +249,7 @@ lock_acquire (struct lock *lock)
   
   //my changes
   enum intr_level old_level;
-	struct thread * curr = thread_current ();
+  struct thread * curr = thread_current ();
 
   old_level = intr_disable ();
 
@@ -277,7 +277,7 @@ lock_acquire (struct lock *lock)
   //my changes end
   sema_down (&lock->semaphore);
 	
-	curr->waiting = NULL;
+  curr->waiting = NULL;
 
   lock->holder = curr;
 
@@ -317,13 +317,13 @@ lock_try_acquire (struct lock *lock)
 void
 lock_release (struct lock *lock) 
 {
-  ASSERT (lock != NULL);
-  ASSERT (lock_held_by_current_thread (lock));
+    ASSERT (lock != NULL);
+    ASSERT (lock_held_by_current_thread (lock));
 
-  lock->holder = NULL;
-  int pri = sema_up (&lock->semaphore);
+    lock->holder = NULL;
+    int pri = sema_up (&lock->semaphore);
 	
-	lock->max_pri = pri;
+    lock->max_pri = pri;
 	if (!thread_mlfqs) {
 		list_remove(&lock->lock_elem);
 		struct thread *curr = thread_current ();
@@ -332,18 +332,19 @@ lock_release (struct lock *lock)
 		struct list_elem *e;
 		struct list *locks = &curr->locks;
 		int max_pri_locks = -1,temp;
-    for (e = list_begin (locks); e != list_end (locks);
-         e = list_next (e))
-      {
-				temp = list_entry(e, struct lock, lock_elem)->max_pri;
-				if (max_pri_locks < temp)
-					max_pri_locks = temp;
-      }			
+        for (e = list_begin (locks); e != list_end (locks);
+             e = list_next (e))
+          {
+		    temp = list_entry(e, struct lock, lock_elem)->max_pri;
+			if (max_pri_locks < temp)
+				max_pri_locks = temp;
+          }			
 		if (max_pri_locks >= 0) curr->priority = max_pri_locks;
 		else curr->priority = curr->base_pri;
 		if (curr->priority < pri) 
-				thread_yield ();
+		    thread_yield ();
 	}
+	
 }
 
 /* Returns true if the current thread holds LOCK, false

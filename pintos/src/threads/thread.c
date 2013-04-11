@@ -509,6 +509,13 @@ thread_get_priority (void)
   return thread_current ()->priority;
 }
 
+/* Increase recent_cpu of current thread by 1. */
+void thread_increase_recent_cpu (void)
+{
+    if (thread_current () != idle_thread)
+        thread_current ()->recent_cpu += (1<<14);
+}
+
 /* Calculate priority. */
 void thread_calculate_priority (struct thread *t)
 {
@@ -519,11 +526,11 @@ void thread_calculate_priority (struct thread *t)
 	if (t == idle_thread)
 		return ;
 
-	int f = (1<<17);
+	int f = (1<<14);
 	int round = f/2;
 	if (t->recent_cpu < 0) round = -round;
 	else if (t->recent_cpu == 0) round = 0;
-	int new_pri = PRI_MAX - (t->recent_cpu / 4 + round)/f - 2*t->nice;
+	int new_pri = PRI_MAX - (t->recent_cpu / 4 + round)/f - t->nice * 2;
 	if (new_pri <= PRI_MAX && new_pri >= PRI_MIN) t->priority = new_pri;
 	else if (new_pri >= PRI_MAX) t->priority = PRI_MAX;
 	else t->priority = PRI_MIN;
@@ -548,7 +555,7 @@ void thread_calculate_priority_all (void)
 
 	list_sort (&ready_list, &thread_priority_less, NULL);
 	
-	if (thread_current () -> priority < list_entry((list_head(&ready_list) -> next), struct thread, elem) -> priority)
+	if (thread_current () != idle_thread && thread_current () -> priority < list_entry((list_head(&ready_list) -> next), struct thread, elem) -> priority)
 		intr_yield_on_return ();	
 
 	//intr_set_level (old_level);
@@ -561,13 +568,13 @@ thread_calculate_recent_cpu (struct thread *t)
 	if (t == idle_thread)
 		return ;
 	
-	int f = (1<<17);
+	int f = (1<<14);
 	int load_avg1 = load_avg * 2;
 	int load_avg2 = load_avg1 + f; // load_avg1 + 1 !!!!! FUUUUUUUUUUUUUUUUUUUUUUUUUUCK
 	int new_cpu = t->recent_cpu;	
 
 	load_avg1 = ((int64_t)load_avg1 * f) / load_avg2;
-	new_cpu = ((int64_t) new_cpu) * load_avg1 / f + t->nice;
+	new_cpu = ((int64_t) new_cpu) * load_avg1 / f + t->nice * f;// t->nice * f !!!!! FUUUUUUUUUUUUUUUUUUUUUUUUUUCK AGGGGGGGAIN
 	t->recent_cpu = new_cpu;
 }
 
@@ -597,7 +604,7 @@ thread_calculate_load_avg ()
 
 	//old_level = intr_disable ();
 
-	int f = (1<<17);
+	int f = (1<<14);
 	int first = 59 * f / 60;
 	int second = f / 60;
 	int new_load_avg = ((int64_t)load_avg) * first / f;
@@ -643,7 +650,7 @@ thread_get_nice (void)
 int
 thread_get_load_avg (void) 
 {
-	int f = (1<<17);
+	int f = (1<<14);
 	int round = f/2;
   return ((int64_t)(load_avg) * 100 + round) / f;
 } 
@@ -652,7 +659,7 @@ thread_get_load_avg (void)
 int
 thread_get_recent_cpu (void) 
 {
-	int f = (1<<17);
+	int f = (1<<14);
 	int round = f/2;
 	if (thread_current () -> recent_cpu < 0) round = -round;
   return ((int64_t)(thread_current () -> recent_cpu) * 100 + round) / f;

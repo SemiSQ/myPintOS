@@ -143,6 +143,9 @@ void thread_sleep (int64_t ticks);
 void thread_block (void);
 void thread_unblock (struct thread *);
 
+/* Increase recent_cpu of current thread by 1. */
+void thread_increase_recent_cpu (void);
+
 /* Calculate and renew the priority of thread. */
 void thread_calculate_priority (struct thread *);
 /* Calculate priority for all. */
