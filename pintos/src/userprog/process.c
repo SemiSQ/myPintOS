@@ -34,9 +34,23 @@ process_execute (const char *file_name)
   /* Make a copy of FILE_NAME.
      Otherwise there's a race between the caller and load(). */
   fn_copy = palloc_get_page (0);
+  //old implement
+  
   if (fn_copy == NULL)
+  
+  //old implement ends
+  //my implement
+  //if (fn_copy == NULL || strlen(fn_copy) >= 4096) //4096 = 4KB
+  //my implement ends
     return TID_ERROR;
   strlcpy (fn_copy, file_name, PGSIZE);
+  
+  //my implement
+  //char *argv[];
+  
+
+  
+  //my implement ends
 
   /* Create a new thread to execute FILE_NAME. */
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
@@ -437,7 +451,8 @@ setup_stack (void **esp)
     {
       success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
       if (success)
-        *esp = PHYS_BASE;
+        *esp = PHYS_BASE - 12; //temporary change
+		//*esp = PHYS_BASE;
       else
         palloc_free_page (kpage);
     }

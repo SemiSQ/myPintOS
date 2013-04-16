@@ -172,8 +172,18 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
-  if (ticks % 4 == 0)
-    
+	if (thread_mlfqs) {
+		//msg ("cpu before :%d", thread_current () -> recent_cpu);
+		thread_increase_recent_cpu ();
+		//msg ("cpu after :%d", thread_current () -> recent_cpu);
+		if (ticks % TIMER_FREQ == 0) {
+			thread_calculate_load_avg ();
+			thread_calculate_recent_cpu_all ();	
+		}
+		if (ticks % 4 == 3) {
+			thread_calculate_priority_all ();	
+		}
+	}
   thread_tick ();
   thread_check_sleep();
 }

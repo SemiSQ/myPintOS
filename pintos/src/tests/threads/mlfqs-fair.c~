@@ -101,7 +101,7 @@ test_mlfqs_fair (int thread_cnt, int nice_min, int nice_step)
   timer_sleep (40 * TIMER_FREQ);
   
   for (i = 0; i < thread_cnt; i++)
-    msg ("Thread %d received %d ticks.", i, info[i].tick_count);
+    msg ("Thread %d received %d ticks.z", i, info[i].tick_count);
 }
 
 static void
@@ -120,6 +120,5 @@ load_thread (void *ti_)
       if (cur_time != last_time)
         ti->tick_count++;
       last_time = cur_time;
-      msg ("thread %d has pri %d, nice %d", thread_current() -> tid, thread_get_priority (), thread_get_nice ());
     }
 }
