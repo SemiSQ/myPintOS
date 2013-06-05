@@ -1,3 +1,41 @@
 Copying tests/userprog/args-none to scratch partition...
-Writing command line to /tmp/Pr5D6HhyAM.dsk...
-qemu -hda /tmp/Pr5D6HhyAM.dsk -hdb /tmp/VzInbGO37p.dsk -hdc /tmp/1XjwNqGtsc.dsk -m 4 -net none -nographic -monitor null
+squish-pty bochs -q
+========================================================================
+                        Bochs x86 Emulator 2.6
+            Built from SVN snapshot on September 2nd, 2012
+                  Compiled on Apr  9 2013 at 18:51:05
+========================================================================
+PiLo hda1
+Loading............
+Kernel command line: -q -f extract run args-none
+Pintos booting with 4,096 kB RAM...
+383 pages available in kernel pool.
+383 pages available in user pool.
+Calibrating timer...  102,400 loops/s.
+hda: 5,040 sectors (2 MB), model "BXHD00011", serial "Generic 1234"
+hda1: 206 sectors (103 kB), Pintos OS kernel (20)
+hda2: 4,096 sectors (2 MB), Pintos file system (21)
+hda3: 83 sectors (41 kB), Pintos scratch (22)
+filesys: using hda2
+scratch: using hda3
+Formatting file system...done.
+Boot complete.
+Extracting ustar archive from scratch device into file system...
+Putting 'args-none' into the file system...
+Erasing ustar archive...
+Executing 'args-none':
+(args) begin
+(args) argc = 1
+(args) argv[0] = 'args-none'
+(args) argv[1] = null
+(args) end
+args-none: exit(0)
+Execution of 'args-none' complete.
+Timer: 479 ticks
+Thread: 0 idle ticks, 407 kernel ticks, 76 user ticks
+hda2 (filesys): 63 reads, 170 writes
+hda3 (scratch): 82 reads, 2 writes
+Console: 941 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...

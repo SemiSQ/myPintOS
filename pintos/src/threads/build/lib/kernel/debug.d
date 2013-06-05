@@ -4,4 +4,4 @@ lib/kernel/debug.o: ../../lib/kernel/debug.c ../../lib/debug.h \
  ../../lib/kernel/stdio.h ../../lib/string.h ../../threads/init.h \
  ../../threads/interrupt.h ../../threads/thread.h ../../lib/kernel/list.h \
  ../../threads/switch.h ../../threads/vaddr.h ../../threads/loader.h \
- ../../devices/serial.h
+ ../../devices/serial.h ../../devices/shutdown.h

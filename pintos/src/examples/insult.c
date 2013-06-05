@@ -312,7 +312,7 @@ main (int argc, char *argv[])
 
           /* Because files have fixed length in the basic Pintos
              file system, the 0 argument means that this option
-             will not be useful until project 4 is
+             will not be useful until task 4 is
              implemented. */
 	  create (argv[i], 0);
 	  handle = open (argv[i]);

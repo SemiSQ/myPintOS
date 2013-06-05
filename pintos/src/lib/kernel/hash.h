@@ -4,7 +4,7 @@
 /* Hash table.
 
    This data structure is thoroughly documented in the Tour of
-   Pintos for Project 3.
+   Pintos for Task 3.
 
    This is a standard hash table with chaining.  To locate an
    element in the table, we compute a hash function over the

@@ -1,7 +1,7 @@
 # Percentage of the testing point total designated for each set of
 # tests.
 
-# This project is primarily about implementing system calls.
+# This task is primarily about implementing system calls.
 # If you do so properly, the base file system functionality
 # should come "for free".  Thus, the points emphasis below.
 

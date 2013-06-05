@@ -1,20 +1,21 @@
-Writing command line to /tmp/Dmrm2l4EJ1.dsk...
 squish-pty bochs -q
 ========================================================================
                         Bochs x86 Emulator 2.6
             Built from SVN snapshot on September 2nd, 2012
                   Compiled on Apr  9 2013 at 18:51:05
 ========================================================================
+PiLo hda1
+Loading............
 Kernel command line: -q -mlfqs run mlfqs-load-avg
 Pintos booting with 4,096 kB RAM...
-373 pages available in kernel pool.
-372 pages available in user pool.
-Calibrating timer...  204,600 loops/s.
+383 pages available in kernel pool.
+383 pages available in user pool.
+Calibrating timer...  102,400 loops/s.
 Boot complete.
 Executing 'mlfqs-load-avg':
 (mlfqs-load-avg) begin
 (mlfqs-load-avg) Starting 60 load threads...
-(mlfqs-load-avg) Starting threads took 1 seconds.
+(mlfqs-load-avg) Starting threads took 5 seconds.
 (mlfqs-load-avg) After 0 seconds, load average=0.00.
 (mlfqs-load-avg) After 2 seconds, load average=0.00.
 (mlfqs-load-avg) After 4 seconds, load average=0.00.
@@ -107,8 +108,8 @@ Executing 'mlfqs-load-avg':
 (mlfqs-load-avg) After 178 seconds, load average=0.00.
 (mlfqs-load-avg) end
 Execution of 'mlfqs-load-avg' complete.
-Timer: 18836 ticks
-Thread: 0 idle ticks, 18838 kernel ticks, 0 user ticks
+Timer: 18866 ticks
+Thread: 0 idle ticks, 18870 kernel ticks, 0 user ticks
 Console: 5386 characters output
 Keyboard: 0 keys pressed
 Powering off...

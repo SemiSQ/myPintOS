@@ -18,7 +18,7 @@ pagedir_create (void)
 {
   uint32_t *pd = palloc_get_page (0);
   if (pd != NULL)
-    memcpy (pd, base_page_dir, PGSIZE);
+    memcpy (pd, init_page_dir, PGSIZE);
   return pd;
 }
 
@@ -32,7 +32,7 @@ pagedir_destroy (uint32_t *pd)
   if (pd == NULL)
     return;
 
-  ASSERT (pd != base_page_dir);
+  ASSERT (pd != init_page_dir);
   for (pde = pd; pde < pd + pd_no (PHYS_BASE); pde++)
     if (*pde & PTE_P) 
       {
@@ -103,8 +103,8 @@ pagedir_set_page (uint32_t *pd, void *upage, void *kpage, bool writable)
   ASSERT (pg_ofs (upage) == 0);
   ASSERT (pg_ofs (kpage) == 0);
   ASSERT (is_user_vaddr (upage));
-  ASSERT (vtop (kpage) >> PTSHIFT < ram_pages);
-  ASSERT (pd != base_page_dir);
+  ASSERT (vtop (kpage) >> PTSHIFT < init_ram_pages);
+  ASSERT (pd != init_page_dir);
 
   pte = lookup_page (pd, upage, true);
 
@@ -128,7 +128,7 @@ pagedir_get_page (uint32_t *pd, const void *uaddr)
   uint32_t *pte;
 
   ASSERT (is_user_vaddr (uaddr));
-  
+
   pte = lookup_page (pd, uaddr, false);
   if (pte != NULL && (*pte & PTE_P) != 0)
     return pte_get_page (*pte) + pg_ofs (uaddr);
@@ -220,7 +220,7 @@ void
 pagedir_activate (uint32_t *pd) 
 {
   if (pd == NULL)
-    pd = base_page_dir;
+    pd = init_page_dir;
 
   /* Store the physical address of the page directory into CR3
      aka PDBR (page directory base register).  This activates our
@@ -260,4 +260,24 @@ invalidate_pagedir (uint32_t *pd)
          "Translation Lookaside Buffers (TLBs)". */
       pagedir_activate (pd);
     } 
+}
+
+
+/*Return true if pointer is 'safe'*/
+bool
+is_safe_ptr(const void* vaddr)
+{
+  uint32_t *ptr;
+  
+  /*Check pointer not NULL and its not pointing to a kernel address*/
+  if(vaddr == NULL || !is_user_vaddr (vaddr))
+    return false;
+
+  /* Check pointer points to mapped space */
+  ptr = lookup_page (active_pd(), vaddr, false);
+  if(ptr == NULL || (*ptr & PTE_P) == 0)
+    return false;
+ 
+  /*Otherwise the pointer is valid*/
+  return true;
 }

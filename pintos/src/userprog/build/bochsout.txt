@@ -30,7 +30,7 @@
 00000000000i[     ]   SB16 support: no
 00000000000i[     ]   USB support: no
 00000000000i[     ]   VGA extension support: vbe 
-00000000000i[MEM0 ] allocated memory at 0x7f263ab29010. after alignment, vector=0x7f263ab2a000
+00000000000i[MEM0 ] allocated memory at 0x7f1208de5010. after alignment, vector=0x7f1208de6000
 00000000000i[MEM0 ] 4.00MB
 00000000000i[MEM0 ] mem block size = 0x00100000, blocks=4
 00000000000i[MEM0 ] rom at 0xfffe0000/131072 ('/usr/local/share/bochs/BIOS-bochs-latest')
@@ -55,12 +55,9 @@
 00000000000i[     ] init_dev of 'keyboard' plugin device by virtual method
 00000000000i[KBD  ] will paste characters every 1000 keyboard ticks
 00000000000i[     ] init_dev of 'harddrv' plugin device by virtual method
-00000000000i[HD   ] HD on ata0-0: '/tmp/XuYMpHPp6k.dsk', 'flat' mode
-00000000000i[IMG  ] hd_size: 516096
-00000000000i[HD   ] ata0-0: using specified geometry: CHS=1/16/63
-00000000000i[HD   ] HD on ata0-1: 'fs.dsk', 'flat' mode
-00000000000i[IMG  ] hd_size: 2064384
-00000000000i[HD   ] ata0-1: using specified geometry: CHS=4/16/63
+00000000000i[HD   ] HD on ata0-0: '/tmp/xpRNhH1xh1.dsk', 'flat' mode
+00000000000i[IMG  ] hd_size: 2580480
+00000000000i[HD   ] ata0-0: using specified geometry: CHS=5/16/63
 00000000000i[HD   ] Using boot sequence disk, none, none
 00000000000i[HD   ] Floppy boot signature check is enabled
 00000000000i[     ] init_dev of 'unmapped' plugin device by virtual method
@@ -113,7 +110,8 @@
 00000000000i[     ] reset of 'unmapped' plugin device by virtual method
 00000000000i[     ] reset of 'biosdev' plugin device by virtual method
 00000000000i[     ] reset of 'speaker' plugin device by virtual method
-00000000000i[SPEAK] Using /dev/console for output
+00000000000e[SPEAK] Failed to open /dev/console: Permission denied
+00000000000e[SPEAK] Deactivating beep on console
 00000000000i[     ] reset of 'extfpuirq' plugin device by virtual method
 00000000000i[     ] reset of 'parallel' plugin device by virtual method
 00000000000i[     ] reset of 'serial' plugin device by virtual method
@@ -131,31 +129,31 @@
 00000491658i[BXVGA] VBE known Display Interface b0c0
 00000491690i[BXVGA] VBE known Display Interface b0c5
 00000494615i[VBIOS] VBE Bios $Id: vbe.c,v 1.64 2011/07/19 18:25:05 vruppert Exp $
-00000833996i[BIOS ] ata0-0: PCHS=1/16/63 translation=none LCHS=1/16/63
-00000887716i[BIOS ] ata0-1: PCHS=4/16/63 translation=none LCHS=4/16/63
-00003983761i[BIOS ] Booting from 0000:7c00
-00004050657i[MEM0 ] allocate_block: block=0x1 used 0x2 of 0x4
-00004178309i[MEM0 ] allocate_block: block=0x2 used 0x3 of 0x4
-00005759911p[UNMP ] >>PANIC<< Shutdown port: shutdown requested
-00005759911i[CPU0 ] CPU is in protected mode (active)
-00005759911i[CPU0 ] CS.mode = 32 bit
-00005759911i[CPU0 ] SS.mode = 32 bit
-00005759911i[CPU0 ] EFER   = 0x00000000
-00005759911i[CPU0 ] | EAX=0000006e  EBX=c010c960  ECX=c002ff8e  EDX=ffff8900
-00005759911i[CPU0 ] | ESP=c002ff70  EBP=c002fff4  ESI=00000000  EDI=c01135ac
-00005759911i[CPU0 ] | IOPL=0 id vip vif ac vm rf nt of df IF tf sf zf af pf cf
-00005759911i[CPU0 ] | SEG sltr(index|ti|rpl)     base    limit G D
-00005759911i[CPU0 ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
-00005759911i[CPU0 ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00005759911i[CPU0 ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00005759911i[CPU0 ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00005759911i[CPU0 ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00005759911i[CPU0 ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00005759911i[CPU0 ] | EIP=c010014e (c010014d)
-00005759911i[CPU0 ] | CR0=0xe0010015 CR2=0x00000000
-00005759911i[CPU0 ] | CR3=0x00116000 CR4=0x00000000
-00005759911i[CPU0 ] 0xc010014d>> out dx, al : EE
-00005759911i[CMOS ] Last time is 5 (Thu Jan  1 08:00:05 1970)
-00005759911i[NGUI ] bx_nogui_gui_c::exit() not implemented yet.
-00005759911i[     ] restoring default signal behavior
-00005759911i[CTRL ] quit_sim called with exit code 1
+00000833946i[BIOS ] ata0-0: PCHS=5/16/63 translation=none LCHS=5/16/63
+00004712316i[BIOS ] IDE time out
+00007773617i[BIOS ] Booting from 0000:7c00
+00008335428i[MEM0 ] allocate_block: block=0x1 used 0x2 of 0x4
+00008436573i[MEM0 ] allocate_block: block=0x2 used 0x3 of 0x4
+00017042024p[UNMP ] >>PANIC<< Shutdown port: shutdown requested
+00017042024i[CPU0 ] CPU is in protected mode (active)
+00017042024i[CPU0 ] CS.mode = 32 bit
+00017042024i[CPU0 ] SS.mode = 32 bit
+00017042024i[CPU0 ] EFER   = 0x00000000
+00017042024i[CPU0 ] | EAX=0000006e  EBX=000000cf  ECX=c00b8000  EDX=00008900
+00017042024i[CPU0 ] | ESP=c000ef80  EBP=c000ef88  ESI=000e01be  EDI=00000000
+00017042024i[CPU0 ] | IOPL=0 id vip vif ac vm rf nt of df IF tf SF zf af pf cf
+00017042024i[CPU0 ] | SEG sltr(index|ti|rpl)     base    limit G D
+00017042024i[CPU0 ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
+00017042024i[CPU0 ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00017042024i[CPU0 ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00017042024i[CPU0 ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00017042024i[CPU0 ] |  FS:0023( 0004| 0|  3) 00000000 ffffffff 1 1
+00017042024i[CPU0 ] |  GS:0023( 0004| 0|  3) 00000000 ffffffff 1 1
+00017042024i[CPU0 ] | EIP=c00273fe (c00273fd)
+00017042024i[CPU0 ] | CR0=0xe0010015 CR2=0x00000000
+00017042024i[CPU0 ] | CR3=0x00101000 CR4=0x00000000
+00017042024i[CPU0 ] 0xc00273fd>> out dx, al : EE
+00017042024i[CMOS ] Last time is 17 (Thu Jan  1 08:00:17 1970)
+00017042024i[NGUI ] bx_nogui_gui_c::exit() not implemented yet.
+00017042024i[     ] restoring default signal behavior
+00017042024i[CTRL ] quit_sim called with exit code 1

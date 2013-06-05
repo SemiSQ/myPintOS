@@ -1,15 +1,16 @@
-Writing command line to /tmp/tG2M2Gq9tj.dsk...
 squish-pty bochs -q
 ========================================================================
                         Bochs x86 Emulator 2.6
             Built from SVN snapshot on September 2nd, 2012
                   Compiled on Apr  9 2013 at 18:51:05
 ========================================================================
+PiLo hda1
+Loading............
 Kernel command line: -q -mlfqs run mlfqs-recent-1
 Pintos booting with 4,096 kB RAM...
-373 pages available in kernel pool.
-372 pages available in user pool.
-Calibrating timer...  204,600 loops/s.
+383 pages available in kernel pool.
+383 pages available in user pool.
+Calibrating timer...  102,400 loops/s.
 Boot complete.
 Executing 'mlfqs-recent-1':
 (mlfqs-recent-1) begin
@@ -106,8 +107,8 @@ Executing 'mlfqs-recent-1':
 (mlfqs-recent-1) After 180 seconds, recent_cpu is 0.00, load_avg is 0.00.
 (mlfqs-recent-1) end
 Execution of 'mlfqs-recent-1' complete.
-Timer: 19015 ticks
-Thread: 0 idle ticks, 19018 kernel ticks, 0 user ticks
+Timer: 19024 ticks
+Thread: 0 idle ticks, 19029 kernel ticks, 0 user ticks
 Console: 7085 characters output
 Keyboard: 0 keys pressed
 Powering off...

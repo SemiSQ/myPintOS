@@ -3,7 +3,7 @@
    Attempts to test the list functionality that is not
    sufficiently tested elsewhere in Pintos.
 
-   This is not a test we will run on your submitted projects.
+   This is not a test we will run on your submitted tasks.
    It is here for completeness.
 */
 

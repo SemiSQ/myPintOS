@@ -1,7 +1,7 @@
 # Percentage of the testing point total designated for each set of
 # tests.
 
-# This project is primarily about virtual memory, but all the previous
+# This task is primarily about virtual memory, but all the previous
 # functionality should work too, and it's easy to screw it up, thus
 # the equal weight placed on each.
 

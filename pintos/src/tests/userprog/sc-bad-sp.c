@@ -2,7 +2,7 @@
    bad address.  The process must be terminated with -1 exit
    code. 
 
-   For Project 3: The bad address lies approximately 64MB below
+   For Task 3: The bad address lies approximately 64MB below
    the code segment, so there is no ambiguity that this attempt
    must be rejected even after stack growth is implemented.
    Moreover, a good stack growth heuristics should probably not

@@ -1,6 +1,7 @@
-Prototype mismatch: sub main::SIGVTALRM () vs none at /home/linux/myPintOS/pintos/src/utils/pintos line 949.
-Constant subroutine SIGVTALRM redefined at /home/linux/myPintOS/pintos/src/utils/pintos line 941.
+Prototype mismatch: sub main::SIGVTALRM () vs none at /home/linux/myPintOS/pintos/src/utils/pintos line 934.
+Constant subroutine SIGVTALRM redefined at /home/linux/myPintOS/pintos/src/utils/pintos line 926.
 00000000000i[     ] reading configuration from bochsrc.txt
+00000000000e[     ] user_shortcut: old-style syntax detected
 00000000000i[     ] installing nogui module as the Bochs GUI
 00000000000i[     ] using log file bochsout.txt
 ========================================================================

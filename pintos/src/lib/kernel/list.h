@@ -10,7 +10,7 @@
    list_elem's.  The list_entry macro allows conversion from a
    struct list_elem back to a structure object that contains it.
 
-   For example, suppose there is a needed for a list of `struct
+   For example, suppose there is a need for a list of `struct
    foo'.  `struct foo' should contain a `struct list_elem'
    member, like so:
 
@@ -108,6 +108,19 @@ struct list
 #define list_entry(LIST_ELEM, STRUCT, MEMBER)           \
         ((STRUCT *) ((uint8_t *) &(LIST_ELEM)->next     \
                      - offsetof (STRUCT, MEMBER.next)))
+
+/* List initialization.
+
+   A list may be initialized by calling list_init():
+
+       struct list my_list;
+       list_init (&my_list);
+
+   or with an initializer using LIST_INITIALIZER:
+
+       struct list my_list = LIST_INITIALIZER (my_list); */
+#define LIST_INITIALIZER(NAME) { { NULL, &(NAME).tail }, \
+                                 { &(NAME).head, NULL } }
 
 void list_init (struct list *);
 
